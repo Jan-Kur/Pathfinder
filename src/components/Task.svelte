@@ -13,7 +13,7 @@
             document.querySelector(".name").style.textDecoration = "line-through";
             document.querySelector(".time").style.textDecoration = "line-through";
             document.querySelector(".task-background").style.backgroundColor = "#3e3f42";
-            document.querySelector(".button").innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#e8eaed"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg>`;
+            document.querySelector(".button").innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px" fill="#e8eaed"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg>`;
         }
         
 
@@ -76,8 +76,8 @@
     .button {
         width: fit-content;
         height: fit-content;
-        min-height: 26px;
-        min-width: 26px;
+        min-height: 22px;
+        min-width: 22px;
         border-radius: 7px;
         background-color: transparent;
         z-index: 1;

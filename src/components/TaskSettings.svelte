@@ -1,9 +1,19 @@
 <script>
 	import CalendarPopup from "./CalendarPopup.svelte";
+    import { Switch } from "$lib/components/ui/switch/index.js";
+    import TimePicker from "./TimePicker.svelte";
+    import {tasks} from "../stores";
 
     let duration = $state(30);
     let from = $state(`12:30`);
     let to = $state(`13:00`);
+    let showTimePicker = $state(false);
+    let whichTimePicker = $state("");
+
+    function timeToMinutes(time) {
+        const [hours, minutes] = time.split(":").map(Number);
+        return hours * 60 + minutes;
+}
 
     function formatTime(minutes) {
         let hours = Math.floor(minutes / 60) !== 0 ? Math.floor(minutes / 60): "";
@@ -16,21 +26,42 @@
             } else {
                 return `${hours}h ${mins}min`
             }
-        }  
+        }
     }
 
-    
+    function saveTask() {
+        $tasks.update(currentTasks => [
+            ...currentTasks,
+            {
+            name: document.querySelector(".name-input").value,
+            start: timeToMinutes(from),
+            end: timeToMinutes(to),
+            color: document.querySelector(".color").value,
+            emoji: document.querySelector(".emoji"),
+            reminder: document.querySelector("#notification").checked        
+        }
+        ]);
+        //TODO: saving to database
+        document.querySelector(".task-settings").remove();
+    }
 
 </script>
 
 <div class="task-settings bg-gray-900">
+    <button class=" absolute top-1 right-1" aria-label="close" onclick="{() => document.querySelector(".task-settings").remove()}"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg></button>
     <input class="name-input bg-gray-900" placeholder="Name">
     <div class="time-container bg-gray-900">
         <div class="duration">Duration: {formatTime(duration)}</div>
         <div class="from-to-container">
-            <button class="from">{from} </button>
+            <button class="from" onclick="{() => {
+                whichTimePicker = "from";
+                showTimePicker = true;
+            }}">{from}</button>
             <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px" fill="#e3e1ea"><path d="m600-200-57-56 184-184H80v-80h647L544-704l56-56 280 280-280 280Z"/></svg>
-            <button class="to">{to}</button>
+            <button class="to" onclick="{() => {
+                whichTimePicker = "to";
+                showTimePicker = true;
+            }}">{to}</button>
         </div>
         <CalendarPopup/>   
     </div>
@@ -43,9 +74,17 @@
             <div class="emoji-text">Emoji</div>
             <input class="emoji" placeholder="Enter one emoji">
         </div>
-        
     </div>
-    
+    <div class="flex items-center justify-between w-[270px]">
+        <label for="notification" class=" text-gray-200">Reminder when the task starts</label>
+        <Switch id="notification" class="dark"/>
+    </div>
+    {#if showTimePicker}
+        <div class="overlay" onclick="{() => showTimePicker = false}">
+            <TimePicker {showTimePicker} {whichTimePicker} {from} {to}/>
+        </div>    
+    {/if}
+    <button class= "bg-slate-400 rounded-md w-[150px] h-[30px] hover:bg-slate-500 text-slate-950 font-medium" onclick={saveTask}>Save</button>
 </div>
 
 <style>
@@ -56,13 +95,14 @@
 
     .task-settings {
         display: flex;
+        position: relative;
         flex-direction: column;
         align-items: center;
-        height: 500px;
+        height: fit-content;
         width: fit-content;
         min-width: 300px;
         overflow-y: auto;
-        gap: 10px;
+        gap: 12px;
         padding: 10px 20px;
         border-radius: 8px;
     }
@@ -117,10 +157,13 @@
     .emoji {
         box-sizing: border-box;
         width: 130px;
-        height: 32px;
+        height: 34px;
         border-radius: 4px;
         background-color: rgb(31, 41, 55);
         margin-top: 2px;
+        color: rgb(227, 225, 234);
+        margin-top: 4px;
+        margin-bottom: 4px;
     }
 
     .customization {
@@ -136,6 +179,17 @@
         align-items: center;
     }
 
-
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
 
 </style>

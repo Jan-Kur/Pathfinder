@@ -1,44 +1,63 @@
 <script>
-    let {name="Prysznic", startTime="20:00", endTime="20:10", duration=10, color="blue", notification, minuteHeight=2, emoji="🚿"} = $props();
-    let taskComplete = $state(false);
-    function taskDone() {
-        if (taskComplete === true) {
-            taskComplete = false;
-            document.querySelector(".name").style.textDecoration = "none";
-            document.querySelector(".time").style.textDecoration = "none";
-            document.querySelector(".task-background").style.backgroundColor = color;
-            document.querySelector(".button").innerHTML = "";
-        } else {
-            taskComplete = true;
-            document.querySelector(".name").style.textDecoration = "line-through";
-            document.querySelector(".time").style.textDecoration = "line-through";
-            document.querySelector(".task-background").style.backgroundColor = "#3e3f42";
-            document.querySelector(".button").innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px" fill="#e8eaed"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg>`;
-        }
-        
+    let { name, startTime, endTime, color, reminder, emoji } = $props();
 
+    let taskComplete = $state(false);
+
+    let nameElement;
+    let timeElement;
+    let backgroundElement;
+    let buttonElement;
+
+    function formatTime(minutes) {
+        let hours = Math.floor(minutes / 60);
+        let mins = minutes % 60;
+        let stringifiedHours = `${hours}`;
+        let stringifiedMins = `${mins}`;
+        return `${stringifiedHours.padStart(2, '0')}:${stringifiedMins.padStart(2, '0')}`
+    }
+
+    function taskDone() {
+        taskComplete = !taskComplete;
+
+        if (taskComplete) {
+            nameElement.style.textDecoration = "line-through";
+            timeElement.style.textDecoration = "line-through";
+            backgroundElement.style.backgroundColor = "#3e3f42";
+            buttonElement.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px" fill="#e8eaed"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg>`;
+        } else {
+            nameElement.style.textDecoration = "none";
+            timeElement.style.textDecoration = "none";
+            backgroundElement.style.backgroundColor = color;
+            buttonElement.innerHTML = "";
+        }
     }
 </script>
 
-<div class="task" style="height: {3 * duration}px; background-color: transparent;">
-    <div class="task-background" style="background-color: {color};"></div>
+<div class="task" style="height: {endTime - startTime}px; background-color: transparent;">
+    <div bind:this={backgroundElement} class="task-background" style="background-color: {color};"></div>
     <div class="emoji-container" style="background-color: {color};">{emoji}</div>
     <div class="text">
-        <div class="name">{name}</div>
-        <div class="time">{startTime} - {endTime} ({duration} min)</div>
+        <div bind:this={nameElement} class="name">{name}</div>
+        <div bind:this={timeElement} class="time">{formatTime(startTime)} - {formatTime(endTime)} ({endTime - startTime}min)</div>
     </div>
-    <button onclick={taskDone} aria-label="Checkbox" class="button" style="border: 3px solid {color}"></button>
+    <button
+        bind:this={buttonElement}
+        onclick={taskDone}
+        aria-label="Checkbox"
+        class="button"
+        style="border: 3px solid {color}"
+    ></button>
 </div>
 
 <style>
     .task {
         display: flex;
         align-items: center;
-        width: 80%;
         margin: 0 auto;
         border-radius: 10px;
         position: relative;
         padding: 0.3rem;
+        min-height: 40px;
         gap: 1rem;
     }
 
@@ -93,7 +112,7 @@
         position: absolute;
         inset: 0;
         z-index: -1;
-        filter: brightness(0.4);
+        filter: brightness(0.3);
         border-radius: 10px;
     }
 </style>

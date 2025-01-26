@@ -4,10 +4,8 @@
     import Timeline from "../components/Timeline.svelte";
     import TaskSettings from "../components/TaskSettings.svelte";
 	import TimePicker from "../components/TimePicker.svelte";
+	import { Time } from "@internationalized/date";
 </script>
 
 <Header/>
-<Task/>
 <Timeline/>
-<TaskSettings/>
-<TimePicker/>

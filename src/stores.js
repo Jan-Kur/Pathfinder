@@ -4,6 +4,7 @@ export const tasks = writable([
     name: "prysznic",
     start: 1200,
     end: 1210,
+    date: "",
     color: "#f72daa",
     emoji: "🚿",
     reminder: true
@@ -11,24 +12,27 @@ export const tasks = writable([
 {
     name: "bieganie",
     start: 1220,
-    end: 1250,
-    color: "#ed3b00",
+    end: 1255,
+    date: "",
+    color: "aquamarine",
     emoji: "🚿",
     reminder: true
 },
 {
-    name: "jedzenie",
-    start: 900,
-    end: 1050,
-    color: "#1eeba7",
+    name: "obiad",
+    start: 600,
+    end: 650,
+    date: "",
+    color: "navy",
     emoji: "🚿",
     reminder: true
 },
 {
-    name: "spanie",
-    start: 565,
-    end: 570,
-    color: "#027bab",
+    name: "kodowanie",
+    start: 700,
+    end: 759,
+    date: "",
+    color: "#fc0356",
     emoji: "🚿",
     reminder: true
 }

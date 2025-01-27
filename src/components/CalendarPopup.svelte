@@ -10,11 +10,15 @@
     import { Calendar } from "$lib/components/ui/calendar";
     import * as Popover from "$lib/components/ui/popover";
 
+    export let selectedDate: string = "";
     const df = new DateFormatter("en-US", {
         dateStyle: "long",
     });
-
     let value: DateValue | undefined = undefined;
+
+    $: if (value) {
+        selectedDate = df.format(value.toDate(getLocalTimeZone()));
+    }
 </script>
 
 <Popover.Root openFocus>

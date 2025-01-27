@@ -1,26 +1,37 @@
 <script>
     import Task from "./Task.svelte";
     import { tasks } from "../stores";
+    import { browser } from "$app/environment";
+    import TaskSettings from "./TaskSettings.svelte";
 
-    let tasksArray = [];
+    let showTaskSettings = $state(false);
+
+    let tasksArray = $state([]);
     tasks.subscribe((value) => {
         tasksArray = [...value].sort((a, b) => a.start - b.start);
+        updateGradientColors();
     });
 
     function updateGradientColors() {
-        if (tasksArray.length > 1) {
+        if (browser && tasksArray.length > 1) {
             const root = document.documentElement;
             root.style.setProperty('--start-color', tasksArray[0].color);
             root.style.setProperty('--end-color', tasksArray[tasksArray.length - 1].color);
         }
     }
 
-    $: updateGradientColors();
-
     function amountOfTime(minutes) {
-        let hours = Math.floor(minutes / 60);
-        let mins = minutes % 60;
-        return `${hours}h ${mins}mins`
+        let hours = Math.floor(minutes / 60) !== 0 ? Math.floor(minutes / 60): "";
+        let mins = minutes % 60 !== 0 ? minutes % 60 : "";
+        if (hours === "") {
+            return `${mins}min`
+        } else {
+            if (mins === "") {
+                return `${hours}h`
+            } else {
+                return `${hours}h ${mins}min`
+            }
+        }
     }
 
     function formatTime(minutes) {
@@ -30,13 +41,18 @@
         let stringifiedMins = `${mins}`;
         return `${stringifiedHours.padStart(2, '0')}:${stringifiedMins.padStart(2, '0')}`
     }
+
+    function addTask() {
+        showTaskSettings = !showTaskSettings;
+    }
 </script>
+
 
 <ol class="timeline-container">
     {#each tasksArray as task, i}
         <li class="timeline-item">
             <span class="time-label">{formatTime(task.start)}</span>
-            <Task name={task.name} startTime={task.start} endTime={task.end} color={task.color} emoji={task.emoji} reminder={task.reminder}s/>
+            <Task name={task.name} startTime={task.start} endTime={task.end} date={"placeholder"} color={task.color} emoji={task.emoji} reminder={task.reminder}/>
         </li>
         {#if i < tasksArray.length - 1}
             {#if task.end < tasksArray[i + 1].start && (tasksArray[i + 1].start - task.end) >= 15}
@@ -57,23 +73,52 @@
         {/if}
     {/each}
     <div class="timeline-line"></div>
-    <button aria-label="add" class="add-button"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/></svg></button>
+    <button aria-label="add" class="add-button text-slate-800" onclick="{addTask}"><svg xmlns="http://www.w3.org/2000/svg" height="26px" viewBox="0 -960 960 960" width="26px" fill="currentColor"><path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/></svg></button>  
 </ol>
+
+{#if showTaskSettings}
+    <div class="task-settings flex justify-center">
+        <TaskSettings/>
+    </div>
+{/if}
 
 <style>   
     .timeline-container {
         max-width: 500px;
-        margin: 2rem auto;
-        padding: 0 1rem;
+        max-height: 600px;
+        overflow-y: auto;
+        margin: 20px auto;
+        padding-left: 40px;
+        padding-right: 5px;
         position: relative;
+        display: flex;
+        flex-direction: column;
     }
+
+    .timeline-container::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .timeline-container::-webkit-scrollbar-track {
+        background: none;
+    }
+
+    .timeline-container::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 10px;
+    }
+
+    .timeline-container::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
 
     .timeline-line {
         position: absolute;
         top: 0;
-        left: 40px;
+        left: 63px;
         width: 2px;
-        height: 100%;
+        height: calc(100% - 47px);
         z-index: 3;
         background: linear-gradient(to bottom, var(--start-color, #fff), var(--end-color, #fff));
     }
@@ -81,7 +126,7 @@
     .timeline-item {
         position: relative;
         z-index: 5;
-        margin: 3px 0;
+        margin: 2px 0;
     }
 
     .time-label {
@@ -109,6 +154,7 @@
         position: relative;
         z-index: 1;
         text-align: center;
+        margin: 2px 0;
     }
 
     .free-time {
@@ -122,18 +168,40 @@
         border-radius: 8px;
         padding: 0.5rem;
         backdrop-filter: blur(5px);
-        background-image: url("path-to-cursive-lines.png");
         background-size: cover;
     }
 
     .add-button {
-        width: 50px;
-        height: fit-content;
-        background-color: #1eeba7;
-        border-radius: 6px;
+        width: 80px;
+        height: 40px;
+        min-height: 40px;
+        background-color: #10d2dd;
+        border: none;
+        border-radius: 8px;
         display: flex;
         align-items: center;
         justify-content: center;
-        position: absolute;
+        margin-top: 5px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+        cursor: pointer;
+        align-self: center;
     }
+
+    .add-button svg {
+        fill: rgb(11, 15, 23);
+        transition: transform 0.2s ease;
+    }
+
+    .add-button:hover {
+        background-color: #0dc0b4;
+        transform: translateY(-2px);
+        box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .add-button:active {
+        transform: translateY(0);
+        box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
+    }
+
 </style>

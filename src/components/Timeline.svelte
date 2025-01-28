@@ -1,16 +1,17 @@
 <script>
     import Task from "./Task.svelte";
-    import { tasks } from "../stores";
+    import { tasks, selectedDate } from "../stores";
     import { browser } from "$app/environment";
     import TaskSettings from "./TaskSettings.svelte";
 
     let showTaskSettings = $state(false);
-
     let tasksArray = $state([]);
-    tasks.subscribe((value) => {
-        tasksArray = [...value].sort((a, b) => a.start - b.start);
-        updateGradientColors();
-    });
+
+    $effect(() => {
+        tasksArray = [...$tasks]
+            .filter(task => task.date === $selectedDate)
+            .sort((a, b) => a.start - b.start);
+    })
 
     function updateGradientColors() {
         if (browser && tasksArray.length > 1) {
@@ -52,7 +53,7 @@
     {#each tasksArray as task, i}
         <li class="timeline-item">
             <span class="time-label">{formatTime(task.start)}</span>
-            <Task name={task.name} startTime={task.start} endTime={task.end} date={"placeholder"} color={task.color} emoji={task.emoji} reminder={task.reminder}/>
+            <Task name={task.name} startTime={task.start} endTime={task.end} date={task.date} color={task.color} emoji={task.emoji} reminder={task.reminder}/>
         </li>
         {#if i < tasksArray.length - 1}
             {#if task.end < tasksArray[i + 1].start && (tasksArray[i + 1].start - task.end) >= 15}

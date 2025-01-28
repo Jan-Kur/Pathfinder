@@ -47,7 +47,8 @@
         const filteredTasks = currentTasks.filter(task => 
             !(task.start === startTime && 
               task.end === endTime && 
-              task.name === name)
+              task.name === name &&
+              task.date === date)
         );
         return filteredTasks;
     });
@@ -84,7 +85,7 @@
                 name,
                 start: formatTime(startTime),
                 end: formatTime(endTime),
-                date: "placeholder",
+                date,
                 color,
                 emoji,
                 reminder

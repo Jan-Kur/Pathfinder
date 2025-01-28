@@ -9,6 +9,7 @@
     import { Button } from "$lib/components/ui/button";
     import { Calendar } from "$lib/components/ui/calendar";
     import * as Popover from "$lib/components/ui/popover";
+    import { formatToISODate } from "../stores";
 
     export let selectedDate: string = "";
     const df = new DateFormatter("en-US", {
@@ -17,7 +18,8 @@
     let value: DateValue | undefined = undefined;
 
     $: if (value) {
-        selectedDate = df.format(value.toDate(getLocalTimeZone()));
+        const dateObj = value.toDate(getLocalTimeZone());
+        selectedDate = formatToISODate(dateObj);
     }
 </script>
 

@@ -1,10 +1,34 @@
 import { writable } from "svelte/store";
+
+function getTodayDate() {
+    const today = new Date();
+    return today.toISOString().split("T")[0];
+}
+
+export const selectedDate = writable(getTodayDate());
+
+export function formatToISODate(date) {
+    if (typeof date === 'string') {
+        if (date.includes(',')) {
+            const newDate = new Date(date);
+            return newDate.toISOString().split('T')[0];
+        }
+        if (date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+            return date;
+        }
+    }
+    if (date instanceof Date) {
+        return date.toISOString().split('T')[0];
+    }
+    return date;
+}
+
 export const tasks = writable([
     {
     name: "prysznic",
     start: 1200,
     end: 1210,
-    date: "",
+    date: getTodayDate(),
     color: "#f72daa",
     emoji: "🚿",
     reminder: true
@@ -13,27 +37,27 @@ export const tasks = writable([
     name: "bieganie",
     start: 1220,
     end: 1255,
-    date: "",
+    date: getTodayDate(),
     color: "aquamarine",
-    emoji: "🚿",
+    emoji: "🏃",
     reminder: true
 },
 {
     name: "obiad",
     start: 600,
     end: 650,
-    date: "",
+    date: getTodayDate(),
     color: "navy",
-    emoji: "🚿",
+    emoji: "🍽️",
     reminder: true
 },
 {
     name: "kodowanie",
     start: 700,
     end: 759,
-    date: "",
+    date: getTodayDate(),
     color: "#fc0356",
-    emoji: "🚿",
+    emoji: "💻",
     reminder: true
 }
 ]);

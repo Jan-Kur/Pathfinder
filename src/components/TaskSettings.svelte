@@ -2,7 +2,8 @@
 	import CalendarPopup from "./CalendarPopup.svelte";
     import { Switch } from "$lib/components/ui/switch/index.js";
     import TimePicker from "./TimePicker.svelte";
-    import {tasks} from "../stores";
+    import {tasks, selectedDate} from "../stores";
+    import { formatToISODate } from "../stores";
 
     let { editMode = false, taskToEdit = null } = $props();
 
@@ -12,10 +13,10 @@
     let taskColor = $state(editMode ? taskToEdit.color : "#4287f5");
     let taskEmoji = $state(editMode ? taskToEdit.emoji : "📝");
     let taskReminder = $state(editMode ? taskToEdit.reminder : false);
+    let taskDate = $state(editMode ? formatToISODate(taskToEdit.date) : formatToISODate($selectedDate));
     let showTimePicker = $state(false);
     let whichTimePicker = $state("");
     let duration = $derived(timeToMinutes(to) - timeToMinutes(from));
-    let selectedDate = $state(editMode ? taskToEdit.date : "");
 
     let errorMessage = $state("");
     let hasError = $state(false);
@@ -30,9 +31,6 @@
 
     function checkOverlap(start, end) {
         let overlap = false;
-        if (editMode) {
-            return
-        }
         let currentTasks;
         tasks.subscribe(value => {
             currentTasks = value;
@@ -42,9 +40,19 @@
         const newEnd = timeToMinutes(end);
         
         currentTasks.forEach(task => {
-            if ((newStart >= task.start && newStart < task.end) || 
+            if (editMode && 
+                task.start === timeToMinutes(taskToEdit.start) &&
+                task.end === timeToMinutes(taskToEdit.end) && 
+                task.name === taskToEdit.name &&
+                task.date === taskToEdit.date) {
+                return;
+            }
+
+
+            if (task.date === taskDate && 
+                ((newStart >= task.start && newStart < task.end) || 
                 (newEnd > task.start && newEnd <= task.end) ||
-                (newStart <= task.start && newEnd >= task.end)) {
+                (newStart <= task.start && newEnd >= task.end))) {
                 overlap = true;
             }
         });
@@ -90,31 +98,36 @@
             return
         }
 
+        console.log('Before update - taskToEdit:', taskToEdit);
+        console.log('Before update - New task date:', taskDate);
+
         const newTask = {
             name: taskName,
             start: timeToMinutes(from),
             end: timeToMinutes(to),
-            date: selectedDate,
+            date: formatToISODate(taskDate),
             color: taskColor,
             emoji: taskEmoji,
             reminder: taskReminder
         };
 
+        console.log('Saving task:', newTask);
+
         tasks.update(currentTasks => {
             if (editMode) {
-
-            const editingTaskStart = timeToMinutes(taskToEdit.start);
-            const editingTaskEnd = timeToMinutes(taskToEdit.end);
-            
-            const updatedTasks = currentTasks.map(task => {
-                if (task.start === editingTaskStart && 
-                    task.end === editingTaskEnd && 
-                    task.name === taskToEdit.name) {
-                    return newTask;
-                }
-                return task;
-            });
-            return updatedTasks;
+                console.log('Editing mode - Original task:', taskToEdit);
+                const updatedTasks = currentTasks.map(task => {
+                    if (task.start === timeToMinutes(taskToEdit.start) && 
+                        task.end === timeToMinutes(taskToEdit.end) && 
+                        task.name === taskToEdit.name &&
+                        task.date === taskToEdit.date) {
+                        console.log('Found task to update');
+                        return newTask;
+                    }
+                    return task;
+                });
+                console.log('Updated tasks array:', updatedTasks);
+                return updatedTasks;
             } else {
                 return [...currentTasks, newTask];
             }
@@ -134,7 +147,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px" fill="#e3e1ea"><path d="m600-200-57-56 184-184H80v-80h647L544-704l56-56 280 280-280 280Z"/></svg>
             <input class="time-input" type="time" required bind:value={to}>
         </div>
-        <CalendarPopup bind:selectedDate/>   
+        <CalendarPopup bind:selectedDate={taskDate}/>   
     </div>
     <div class="customization">
         <div class="color-container">

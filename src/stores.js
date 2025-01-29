@@ -11,14 +11,18 @@ export function formatToISODate(date) {
     if (typeof date === 'string') {
         if (date.includes(',')) {
             const newDate = new Date(date);
-            return newDate.toISOString().split('T')[0];
+            const userTimeZoneDiff = newDate.getTimezoneOffset() * 60000;
+            const adjustedDate = new Date(newDate.getTime() - userTimeZoneDiff);
+            return adjustedDate.toISOString().split('T')[0];
         }
         if (date.match(/^\d{4}-\d{2}-\d{2}$/)) {
             return date;
         }
     }
     if (date instanceof Date) {
-        return date.toISOString().split('T')[0];
+        const userTimeZoneDiff = date.getTimezoneOffset() * 60000;
+        const adjustedDate = new Date(date.getTime() - userTimeZoneDiff);
+        return adjustedDate.toISOString().split('T')[0];
     }
     return date;
 }

@@ -13,13 +13,20 @@
             .sort((a, b) => a.start - b.start);
     })
 
-    function updateGradientColors() {
-        if (browser && tasksArray.length > 1) {
-            const root = document.documentElement;
-            root.style.setProperty('--start-color', tasksArray[0].color);
-            root.style.setProperty('--end-color', tasksArray[tasksArray.length - 1].color);
-        }
+    function createGradientString(tasks) {
+        if (!tasks.length) return 'white';
+        const stops = tasks.map((task, index) => {
+            const percentage = (index / (tasks.length - 1)) * 100;
+            return `${task.color} ${percentage}%`;
+        });
+        return `linear-gradient(to bottom, ${stops.join(', ')})`;
     }
+
+    let gradientStyle = $derived(
+        tasksArray.length > 0 
+            ? createGradientString(tasksArray) 
+            : 'white'
+    );
 
     function amountOfTime(minutes) {
         let hours = Math.floor(minutes / 60) !== 0 ? Math.floor(minutes / 60): "";
@@ -73,7 +80,7 @@
             </li>
         {/if}
     {/each}
-    <div class="timeline-line"></div>
+    <div class="timeline-line" style="background: {gradientStyle};"></div>
     <button aria-label="add" class="add-button text-slate-800" onclick="{addTask}"><svg xmlns="http://www.w3.org/2000/svg" height="26px" viewBox="0 -960 960 960" width="26px" fill="currentColor"><path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/></svg></button>  
 </ol>
 
@@ -88,12 +95,12 @@
         max-width: 500px;
         max-height: 600px;
         overflow-y: auto;
-        margin: 20px auto;
         padding-left: 40px;
         padding-right: 5px;
         position: relative;
         display: flex;
         flex-direction: column;
+        flex: 1;
     }
 
     .timeline-container::-webkit-scrollbar {
@@ -121,7 +128,6 @@
         width: 2px;
         height: calc(100% - 47px);
         z-index: 3;
-        background: linear-gradient(to bottom, var(--start-color, #fff), var(--end-color, #fff));
     }
 
     .timeline-item {

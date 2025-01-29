@@ -6,6 +6,8 @@
 	import TimePicker from "../components/TimePicker.svelte";
 	import { Time } from "@internationalized/date";
     import { selectedDate } from "../stores";
+    import Goals from "../components/Goals.svelte";
+    import GoalSettings from "../components/GoalSettings.svelte";
 
     function formatDate(dateString) {
         const date = new Date(dateString);
@@ -23,4 +25,11 @@
 <h2 class="text-center text-xl font-semibold text-gray-200 mt-4 mb-2">
     {formatDate($selectedDate)}
 </h2>
-<Timeline/>
+<div class="flex justify-between items-start m-6">
+    <Goals/>
+    <Timeline/>
+</div>
+
+
+
+

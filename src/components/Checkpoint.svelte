@@ -1,3 +1,24 @@
 <script>
+
+    let {checkpoint} = $props();
+
+    let showCheckpoint = $state(false);
+    
+    function openCheckpoint() {
+        showCheckpoint = !showCheckpoint;
+    }
     
 </script>
+
+<div class="checkpoint-container flex-col items-center">
+    <div class="name"></div>
+    <button aria-label="Checkpoint-flag-button" class="flag-btn" onclick={openCheckpoint}>
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M200-120v-680h360l16 80h224v400H520l-16-80H280v280h-80Zm300-440Zm86 160h134v-240H510l-16-80H280v240h290l16 80Z"/></svg>
+    </button>
+
+    {#if showCheckpoint}
+        <div class="checkpoint-popup">
+            <div class="timer"></div>
+        </div>
+    {/if}
+</div>

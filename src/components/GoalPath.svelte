@@ -2,49 +2,90 @@
     import Checkpoint from "./Checkpoint.svelte";
     import { goals } from "../stores";
     
-    let {goalId} = $props();
+    let {goalId, updateSelectedGoal} = $props();
     let goal = $derived($goals.find(g => g.id === goalId));
     let totalPoints = $state(0);
     let maxPoints = $derived(goal.hours * 600);
     let progress = $derived(Math.min((totalPoints / maxPoints) * 100, 100));
+    let showCheckpointSettings = $state(false);
+    let newCheckpointId = $state(null);
 
     
     function addCheckpoint() {
+        console.log(goal)
+        const checkpointId = crypto.randomUUID();
         goals.update(currentGoals => 
             currentGoals.map(g =>
                 g.id === goalId
                     ? { ...g, checkpoints: [...g.checkpoints, { 
-                        id: crypto.randomUUID(),
+                        id: checkpointId,
                         name: "",
-                        totalTime: 0,
-                        timers: [],
+                        isCompleted: false,
+                        timer: {
+                            totalTime: 0,
+                            isRunning: false,
+                            lastStartTime: 0,
+                            tags: []
+                        },
                     }] }
                     : g
             )
         );
+        newCheckpointId = checkpointId;
+        console.log(goal)
+        showCheckpointSettings = true;
+    }
+
+    function closePath() {
+        updateSelectedGoal(null);
+    }
+
+    function handleNameSubmit(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target)
+        const checkpointName = formData.get("checkpointName");
+
+        goals.update(currentGoals => 
+            currentGoals.map(g => 
+                g.id === goalId
+                    ? {
+                        ...g,
+                        checkpoints: g.checkpoints.map(c => 
+                            c.id === newCheckpointId
+                                ? { ...c, name: checkpointName }
+                                : c
+                        )
+                    }
+                    : g
+            )
+        );
+
+        showCheckpointSettings = false;
+        newCheckpointId = null;
     }
 
 </script>
 
-<div class="path-container flex flex-col gap-6 p-4 h-[calc(100vh-60px)] -mt-[50px] w-full max-w-2xl mx-auto overflow-hidden">
-    <div class="stats-card bg-slate-800/40 backdrop-blur-lg border border-slate-700/20 rounded-2xl p-4 flex-shrink-0">
-        <div class="goal-header flex items-center gap-4 mb-6">
-            <span class="goal-emoji text-4xl">{goal.emoji}</span>
-            <h2 class="text-2xl font-semibold text-slate-200 text-center">{goal.name}</h2>
+<div class="path-container flex flex-col -m-[70px] gap-4 lg:gap-6 p-2 lg:p-4 h-[calc(100vh-60px)] w-full max-w-2xl mx-auto overflow-hidden">
+    <div class="stats-card bg-slate-800/40 backdrop-blur-lg border border-slate-700/20 rounded-2xl p-3 lg:p-4 flex-shrink-0">
+        <div class="goal-header flex items-center gap-2 lg:gap-4 mb-4 lg:mb-6">
+            <span class="goal-emoji text-3xl lg:text-4xl">{goal.emoji}</span>
+            <h2 class="text-xl lg:text-2xl font-semibold text-slate-200">{goal.name}</h2>
+            <button aria-label="Close" onclick={closePath}><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg></button>
         </div>
         
-        <div class="stats-grid grid grid-cols-3 gap-4">
+        <div class="stats-grid grid grid-cols-3 gap-2 lg:gap-4">
             <div class="stat-item flex flex-col items-center">
-                <span class="text-2xl font-bold text-cyan-500">{totalPoints}</span>
-                <span class="text-sm text-slate-400 mt-1">Points Earned</span>
+                <span class="text-xl lg:text-2xl font-bold text-cyan-500">{totalPoints}</span>
+                <span class="text-xs lg:text-sm text-slate-400 mt-1">Points Earned</span>
             </div>
             <div class="stat-item flex flex-col items-center">
-                <span class="text-2xl font-bold text-cyan-500">{maxPoints}</span>
-                <span class="text-sm text-slate-400 mt-1">Goal Points</span>
+                <span class="text-xl lg:text-2xl font-bold text-cyan-500">{maxPoints}</span>
+                <span class="text-xs lg:text-sm text-slate-400 mt-1">Goal Points</span>
             </div>
             <div class="stat-item flex flex-col items-center">
-                <span class="text-2xl font-bold text-cyan-500">{progress.toFixed(1)}%</span>
-                <span class="text-sm text-slate-400 mt-1">Progress</span>
+                <span class="text-xl lg:text-2xl font-bold text-cyan-500">{progress.toFixed(1)}%</span>
+                <span class="text-xs lg:text-sm text-slate-400 mt-1">Progress</span>
             </div>
         </div>
     </div>
@@ -63,21 +104,38 @@
             </div>
         </div>
 
-        <div class="checkpoints-container relative z-10 flex flex-col gap-8 w-full max-w-md mx-auto">
+        <div class="checkpoints-container relative z-10 flex flex-col gap-6 lg:gap-8 w-full max-w-[90%] lg:max-w-md mx-auto">
             {#each goal.checkpoints as checkpoint}
-                <Checkpoint/>
+                <Checkpoint {checkpoint}/>
             {/each}
         </div>
     </div>
-    <button class="add-checkpoint-btn flex items-center gap-2 px-5 py-3 
+
+    {#if showCheckpointSettings}
+        <form class="checkpoint-form bg-slate-800/40 backdrop-blur-lg border border-slate-700/20 rounded-xl p-4" onsubmit={handleNameSubmit}>
+            <input name="checkpointName" placeholder="Checkpoint name" class="w-full bg-transparent border-b border-slate-700 text-slate-200 px-2 py-1 focus:outline-none focus:border-cyan-500">
+            <button type="submit" class="mt-4 px-4 py-2 bg-cyan-500/20 hover:bg-cyan-500/30  text-slate-200 rounded-lg border border-cyan-500/30">Save</button>
+        </form>
+    {/if}
+
+    <button class="add-checkpoint-btn flex items-center gap-2 px-4 lg:px-5 py-2 lg:py-3 
             bg-cyan-500/20 hover:bg-cyan-500/30 text-slate-200 rounded-xl border border-cyan-500/30 
-            transition-colors duration-200 text-sm font-medium mx-auto" onclick={addCheckpoint}>
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 -960 960 960" fill="currentColor"><path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/></svg>
+            transition-colors duration-200 text-sm font-medium mx-auto" onclick="{addCheckpoint}">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 lg:w-5 lg:h-5" viewBox="0 -960 960 960" fill="currentColor">
+            <path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/>
+        </svg>
         Add Checkpoint
     </button>
 </div>
 
 <style>
+
+    @media (max-width: 1024px) {
+        .path-container {
+            margin-top: 0;
+        }
+    }
+
     .line-fill {
         transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     }

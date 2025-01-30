@@ -21,44 +21,80 @@
         editingGoal = value;
     }
 
+    function updateSelectedGoal(value) {
+        selectedGoal = value;
+        if (!goalsContainerElement) {
+            
+        }
+    }
+    
+
 </script>
 
-<div class="goals-container" bind:this={goalsContainerElement}>
-    {#each $goals as goal}
-        <button 
-            class="goal-box"
-            class:is-editing={editingGoal?.id === goal.id}
-            onclick={() => {
-                if (!editingGoal) {
-                    handleGoalClick(goal);
-                }}
-            }
-        >   {#if editingGoal?.id === goal.id}
-                <div class="goal-settings">
-                    <GoalSettings {goal} {updateEditingGoal}/>
-                </div>
-            {:else if !goal.isSet}
-                <div class="empty-goal">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="plus-icon" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/></svg>
-                    <span class="mt-2">Add Goal</span>
-                </div>
-            {:else}
-                <div class="goal-content">
-                    <div class="goal-emoji">{goal.emoji}</div>
-                    <h3 class="goal-name">{goal.name}</h3>
-                    <div class="goal-details">
-                        <span>{goal.hours}h goal</span>
-                        <span>Deadline: {formatToISODate(goal.deadline)}</span>
+{#if !selectedGoal}
+    <div class="goals-container" bind:this={goalsContainerElement}>
+        {#each $goals as goal}
+            <div 
+                role="button"
+                tabindex="0"
+                class="goal-box"
+                class:is-editing={editingGoal?.id === goal.id}
+                onclick={() => {
+                    if (!editingGoal) {
+                        handleGoalClick(goal);
+                    }}
+                }
+            >   {#if editingGoal?.id === goal.id}
+                    <div class="goal-settings">
+                        <GoalSettings {goal} {updateEditingGoal}/>
                     </div>
+                {:else if !goal.isSet}
+                    <div class="empty-goal">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="plus-icon" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/></svg>
+                        <span class="mt-2">Add Goal</span>
+                    </div>
+                {:else if goal.isSet}
+                    <div class="goal-content">
+                        <div class="goal-emoji">{goal.emoji}</div>
+                        <h3 class="goal-name">{goal.name}</h3>
+                        <div class="goal-details">
+                            <span>{goal.hours}h goal</span>
+                            <span>Deadline: {formatToISODate(goal.deadline)}</span>
+                        </div>
+                        <div class="goal-buttons">
+                            <button class="edit-btn" aria-label="Edit goal" onclick={(e) => {
+                                e.stopPropagation
+                                editingGoal = goal;
+                            }}><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z"/></svg></button>
+                            <button class="delete-btn" aria-label="Delete goal" onclick={(e) => {
+                                e.stopPropagation()
+                                goals.update(currentGoals => {
+                                    return currentGoals.map(g => {
+                                        if (g.id === goal.id) {
+                                            return {
+                                                ...g,
+                                                name: "",
+                                                hours: 0,
+                                                deadline: "",
+                                                emoji: "",
+                                                isSet: false,
+                                            }
+                                        }
+                                        return g
+                                    })
+                                })
+                            }}><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/></svg></button>
+                        </div>
+                    </div>
+                {/if}
                 </div>
-            {/if}
-        </button>
-    {/each}
-</div>
+        {/each}
+    </div>
+{/if}
 
 {#if selectedGoal}
     <div>
-        <GoalPath goalId={selectedGoal.id}/>
+        <GoalPath goalId={selectedGoal.id} {updateSelectedGoal}/>
     </div>
 {/if}
 
@@ -68,10 +104,22 @@
         display: flex;
         flex-direction: column;
         gap: 2rem;
-        width: 400px;
+        width: 100%;
+        max-width: 400px;
         height: calc(100vh - 60px);
         padding: 1rem;
-        margin-top: -50px;
+        margin-top: -70px;
+        margin-inline: auto;
+    }
+
+    .goal-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        align-items: center;
+        position: absolute;
+        top: 10px;
+        right: 10px;
     }
 
     .goal-box {
@@ -84,6 +132,7 @@
         cursor: pointer;
         flex: 1;
         flex-shrink: 1;
+        position: relative;
     }
 
     .goal-box:hover {

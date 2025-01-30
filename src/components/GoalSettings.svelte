@@ -4,10 +4,10 @@
 
     let {goal, updateEditingGoal} = $props();
 
-    let name = $state("");
-    let hours = $state(0);
-    let deadline = $state("");
-    let emoji = $state("");
+    let name = $state(goal.name ? goal.name : "");
+    let hours = $state(goal.hours ? goal.hours : 0);
+    let deadline = $state(goal.deadline ? goal.deadline : "");
+    let emoji = $state(goal.emoji ? goal.emoji : "");
 
     function cancel() {
         updateEditingGoal(null);
@@ -30,7 +30,7 @@
                 return g
             })
         })
-        updateEditingGoal(null);
+        updateEditingGoal(null)
     }
 </script>
 
@@ -134,7 +134,7 @@
     }
 
     .input-field {
-        width: 100%;
+        width: 90%;
         padding: 0.5rem 0.75rem;
         background-color: rgb(15 23 42 / 0.3);
         border: 1px solid rgb(71 85 105 / 0.3);

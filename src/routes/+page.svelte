@@ -8,6 +8,7 @@
     import { selectedDate } from "../stores";
     import Goals from "../components/Goals.svelte";
     import GoalSettings from "../components/GoalSettings.svelte";
+    import Checkpoint from "../components/Checkpoint.svelte";
 
     function formatDate(dateString) {
         const date = new Date(dateString);
@@ -25,16 +26,17 @@
     <h2 class="text-center text-xl font-semibold text-gray-200 p-4 pb-0">
         {formatDate($selectedDate)}
     </h2>
-    <div class="flex-1 flex justify-between items-start py-4 px-6 mb-2">
-        <div class="flex-shrink-0 w-1/4">
+    <div class="flex-1 flex flex-col lg:flex-row justify-between items-start py-4 px-2 lg:px-6 mb-2 gap-4">
+        <div class="w-full lg:w-[30%] xl:w-[25%] min-w-0">
             <Goals/>
         </div>
         
-        <div class="flex-1 flex justify-center">
+        <div class="flex-1 w-full min-w-0">
             <Timeline/>
         </div>
         
-        <div class="flex-shrink-0 w-1/4">
+        <div class="">
+            <Checkpoint/>
         </div>
     </div>
 </div>

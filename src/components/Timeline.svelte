@@ -92,7 +92,7 @@
 
 <style>   
     .timeline-container {
-        max-width: 500px;
+        max-width: 800px;
         max-height: 650px;
         overflow-y: auto;
         padding-left: 40px;

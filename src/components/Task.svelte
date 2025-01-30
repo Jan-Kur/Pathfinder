@@ -125,16 +125,16 @@
 
     .name {
         color: #fff;
-        font-size: 12px;
+        font-size: 16px;
         font-weight: 600;
-        line-height: 12px;
+        line-height: 16px;
     }
 
     .time {
         color: rgb(190, 190, 190);
-        font-size: 12px;
+        font-size: 14px;
         font-weight: 400;
-        line-height: 12px;
+        line-height: 14px;
     }
 
     .button-container {

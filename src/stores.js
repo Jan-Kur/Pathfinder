@@ -5,6 +5,13 @@ function getTodayDate() {
     return today.toISOString().split("T")[0];
 }
 
+export function formatTime(seconds) {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = Math.floor(seconds % 60);
+    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+}
+
 export const selectedDate = writable(getTodayDate());
 export const goals = writable([
         { id: 1, isSet: false, name: "", emoji: "", hours: 0, deadline: "", checkpoints: []},

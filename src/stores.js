@@ -6,6 +6,11 @@ function getTodayDate() {
 }
 
 export const selectedDate = writable(getTodayDate());
+export const goals = writable([
+        { id: 1, isSet: false, name: "", emoji: "", hours: 0, deadline: "", checkpoints: []},
+        { id: 2, isSet: false, name: "", emoji: "", hours: 0, deadline: "", checkpoints: []},
+        { id: 3, isSet: false, name: "", emoji: "", hours: 0, deadline: "", checkpoints: []}
+    ])
 
 export function formatToISODate(date) {
     if (typeof date === 'string') {

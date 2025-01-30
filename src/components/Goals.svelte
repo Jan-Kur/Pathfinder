@@ -1,15 +1,9 @@
 <script>
     import { fade } from 'svelte/transition';
     import GoalSettings from './GoalSettings.svelte';
-    import { formatToISODate } from '../stores';
+    import { formatToISODate, goals } from '../stores';
     import GoalPath from './GoalPath.svelte';
     
-    let goals = $state([
-        { id: 1, isSet: false, name: "", emoji: "", hours: 0, deadline: "", checkpoints: []},
-        { id: 2, isSet: false, name: "", emoji: "", hours: 0, deadline: "", checkpoints: []},
-        { id: 3, isSet: false, name: "", emoji: "", hours: 0, deadline: "", checkpoints: []}
-    ]);
-
     let selectedGoal = $state(null);
     let editingGoal = $state(null);
     let goalsContainerElement;
@@ -19,7 +13,7 @@
             editingGoal = goal;
         } else {
             selectedGoal = goal;
-            //goalsContainerElement.remove();
+            goalsContainerElement.remove();
         }
     }
 
@@ -30,7 +24,7 @@
 </script>
 
 <div class="goals-container" bind:this={goalsContainerElement}>
-    {#each goals as goal}
+    {#each $goals as goal}
         <button 
             class="goal-box"
             class:is-editing={editingGoal?.id === goal.id}
@@ -64,7 +58,7 @@
 
 {#if selectedGoal}
     <div>
-        <GoalPath {selectedGoal}/>
+        <GoalPath goalId={selectedGoal.id}/>
     </div>
 {/if}
 
@@ -77,7 +71,7 @@
         width: 400px;
         height: calc(100vh - 60px);
         padding: 1rem;
-        margin-top: -70px;
+        margin-top: -50px;
     }
 
     .goal-box {

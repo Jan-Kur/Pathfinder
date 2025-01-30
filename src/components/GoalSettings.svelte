@@ -1,6 +1,6 @@
 <script>
     import CalendarPopup from "./CalendarPopup.svelte";
-    import { formatToISODate } from "../stores";
+    import { formatToISODate, goals } from "../stores";
 
     let {goal, updateEditingGoal} = $props();
 
@@ -9,18 +9,27 @@
     let deadline = $state("");
     let emoji = $state("");
 
-    function cancel(event) {
-        //event.preventDefault();
+    function cancel() {
         updateEditingGoal(null);
     }
 
     function save(event) {
         event.preventDefault()
-        goal.name = name;
-        goal.hours = hours;
-        goal.deadline = formatToISODate(deadline);
-        goal.emoji = emoji;
-        goal.isSet = true;
+        goals.update(currentGoals => {
+            return currentGoals.map(g => {
+                if (g.id === goal.id) {
+                    return {
+                        ...g,
+                        name,
+                        hours,
+                        deadline: formatToISODate(deadline),
+                        emoji,
+                        isSet: true
+                    }
+                }
+                return g
+            })
+        })
         updateEditingGoal(null);
     }
 </script>

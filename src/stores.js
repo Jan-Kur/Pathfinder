@@ -128,7 +128,7 @@ export const unscheduledTasks = writable([
 },
 {
     name: "zakupy",
-    color: "#orange",
+    color: "orange",
     emoji: "🛍️",
     date: getTodayDate()
 }])

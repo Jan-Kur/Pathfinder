@@ -10,7 +10,11 @@
     let backgroundElement;
     let buttonElement;
 
-    let showTaskSettings = $state(false);
+    let showSettings = $state(false);
+
+    function updateShowUnscheduledSettings() {
+        showSettings = false;
+    }
 
     function taskDone() {
         taskComplete = !taskComplete;
@@ -18,19 +22,17 @@
 
         if (taskComplete) {
             nameElement.style.textDecoration = "line-through";
-            timeElement.style.textDecoration = "line-through";
             backgroundElement.style.backgroundColor = "#3e3f42";
             buttonElement.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px" fill="#e8eaed"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg>`;
         } else {
             nameElement.style.textDecoration = "none";
-            timeElement.style.textDecoration = "none";
             backgroundElement.style.backgroundColor = color;
             buttonElement.innerHTML = "";
         }
     }
 
     function editTask() {
-        showTaskSettings = !showTaskSettings;
+        showSettings = !showSettings;
     }
 
     function deleteTask() {
@@ -67,7 +69,7 @@
     </div>
 </div>
 
-{#if showTaskSettings}
+{#if showSettings}
     <div class="task-settings">
         <UnscheduledTasksSettings
             editMode={true}
@@ -77,6 +79,7 @@
                 emoji,
                 date
             }}
+            {updateShowUnscheduledSettings}
         />
     </div>
 {/if}
@@ -89,9 +92,12 @@
         border-radius: 10px;
         position: relative;
         padding: 0.3rem;
-        min-height: 40px;
+        height: 50px;
+        width: 80%;
+        max-width: 400px;
         z-index: 20;
         gap: 1rem;
+        min-width: 250px;
     }
 
     .emoji-container {

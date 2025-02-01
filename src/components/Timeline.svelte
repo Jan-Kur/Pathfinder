@@ -7,6 +7,10 @@
     let showTaskSettings = $state(false);
     let tasksArray = $state([]);
 
+    function updateShowSettings() {
+        showTaskSettings = false;
+    }
+
     $effect(() => {
         tasksArray = [...$tasks]
             .filter(task => task.date === $selectedDate)
@@ -82,21 +86,19 @@
     {/each}
     <div class="timeline-line" style="background: {gradientStyle};"></div>
     <button aria-label="add" class="add-button text-slate-800" onclick="{addTask}"><svg xmlns="http://www.w3.org/2000/svg" height="26px" viewBox="0 -960 960 960" width="26px" fill="currentColor"><path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/></svg></button>  
+    {#if showTaskSettings}
+        <div class="task-settings flex justify-center">
+            <TaskSettings {updateShowSettings} />
+        </div>
+    {/if}
 </ol>
-
-{#if showTaskSettings}
-    <div class="task-settings flex justify-center">
-        <TaskSettings/>
-    </div>
-{/if}
 
 <style>   
     .timeline-container {
         max-width: 800px;
-        max-height: 650px;
+        max-height: 635px;
         overflow-y: auto;
         padding-left: 40px;
-        padding-right: 5px;
         position: relative;
         display: flex;
         flex-direction: column;

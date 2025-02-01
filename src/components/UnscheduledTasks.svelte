@@ -7,6 +7,10 @@
 
     let unscheduledTasksArray = $state([]);
 
+    function updateShowUnscheduledSettings() {
+        showSettings = false;
+    }
+
     $effect(() => {
         unscheduledTasksArray = [...$unscheduledTasks].filter(task => task.date === $selectedDate);
     })
@@ -17,13 +21,16 @@
 
 </script>
 
-<div class="tasks-container w-[90%] h-[700px] px-5 -mt-[54px] relative rounded-3xl bg-slate-700 bg-opacity-50 flex flex-col items-center">
-    {#each unscheduledTasksArray as task}
-        <UnschedTask name={task.name} color={task.color} emoji={task.emoji} date={task.date}/>
-    {/each}
+<div class="tasks-container w-[90%] h-[690px] px-5 py-3 -mt-[54px] relative rounded-3xl bg-slate-700 bg-opacity-50 flex flex-col items-center">
+    <div class="text-xl font-semibold text-gray-200 mb-4 py-2 border-b border-slate-600 w-full text-center">Unscheduled Tasks</div>
+    <div class="tasks flex flex-col items-center gap-2 w-full overflow-y-auto">
+        {#each unscheduledTasksArray as task}
+            <UnschedTask name={task.name} color={task.color} emoji={task.emoji} date={task.date}/>
+        {/each}
+    </div>
     {#if showSettings}
-        <div class="settings-container absolute bottom-[12%]">
-            <UnscheduledTasksSettings/>
+        <div class="settings-container absolute bottom-[15%]">
+            <UnscheduledTasksSettings {updateShowUnscheduledSettings}/>
         </div>
     {/if}
     <button aria-label="add" class="add-button text-slate-800 absolute bottom-[5%]" onclick="{addUnscheduledTask}"><svg xmlns="http://www.w3.org/2000/svg" height="26px" viewBox="0 -960 960 960" width="26px" fill="currentColor"><path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/></svg></button>

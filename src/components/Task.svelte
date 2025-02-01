@@ -13,6 +13,10 @@
 
     let showTaskSettings = $state(false);
 
+    function updateShowSettings() {
+        showTaskSettings = false;
+    }
+
     function formatTime(minutes) {
         let hours = Math.floor(minutes / 60);
         let mins = minutes % 60;
@@ -90,6 +94,7 @@
                 emoji,
                 reminder
             }}
+            {updateShowSettings}
         />
     </div>
 {/if}

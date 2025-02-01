@@ -8,7 +8,7 @@
     import Goals from "../components/Goals.svelte";
     import GoalSettings from "../components/GoalSettings.svelte";
     import Checkpoint from "../components/Checkpoint.svelte";
-	import UnscheduledTasks from "../components/UnscheduledTasks.svelte";
+    import UnscheduledTasks from "../components/UnscheduledTasks.svelte";
 
     function formatDate(dateString) {
         const date = new Date(dateString);
@@ -23,20 +23,31 @@
 
 <div class="flex flex-col min-h-screen">
     <Header/>
-    <h2 class="text-center text-xl font-semibold text-gray-200 p-4 pb-0">
-        {formatDate($selectedDate)}
-    </h2>
-    <div class="flex-1 flex flex-col lg:flex-row justify-between items-start py-4 px-2 lg:px-6 mb-2 gap-4">
-        <div class="w-full lg:w-1/3 min-w-0">
-            <Goals/>
-        </div>
+    <main class="flex-1 flex flex-col px-6 lg:px-12">
+        <h2 class="text-center text-xl font-semibold text-gray-200 py-4">
+            {formatDate($selectedDate)}
+        </h2>
         
-        <div class="w-full lg:w-1/3 min-w-0">
-            <Timeline/>
+        <div class="flex-1 flex flex-col lg:flex-row justify-between items-start gap-8">
+            <section class="w-full lg:w-1/3 flex justify-center">
+                <Goals/>
+            </section>
+            
+            <section class="w-full lg:w-1/3 flex justify-center">
+                <Timeline/>
+            </section>
+            
+            <section class="w-full lg:w-1/3 flex justify-center">
+                <UnscheduledTasks/>
+            </section>
         </div>
-        
-        <div class="w-full lg:w-1/3 min-w-0 lg:h-full flex justify-center items-center">
-            <UnscheduledTasks/>
-        </div>
-    </div>
+    </main>
 </div>
+
+<style>
+    main {
+        max-width: 1920px;
+        margin: 0 auto;
+        width: 100%;
+    }
+</style>

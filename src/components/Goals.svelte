@@ -108,9 +108,9 @@
         width: 100%;
         max-width: 400px;
         height: calc(100vh - 60px);
-        padding: 1rem;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
         margin-top: -70px;
-        margin-inline: auto;
     }
 
     .goal-buttons {

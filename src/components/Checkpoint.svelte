@@ -1,6 +1,7 @@
 <script>
     import { formatTime, updateCheckpoint, formatTagTime, updateGoalPoints} from "../stores";
     import { fade, slide } from 'svelte/transition';
+    import { onDestroy } from "svelte";
 
     let {checkpoint, goal} = $props();
     let showCheckpoint = $state(false);
@@ -8,6 +9,20 @@
     
     $effect(() => {
         displayTime = checkpoint.timer.totalTime;
+    });
+
+    onDestroy(() => {
+        if (checkpoint.timer.timerId) {
+            clearInterval(checkpoint.timer.timerId);
+            // Clear timer state in store
+            updateCheckpoint(goal.id, checkpoint.id, {
+                timer: {
+                    ...checkpoint.timer,
+                    isRunning: false,
+                    timerId: null
+                }
+            });
+        }
     });
 
     let checkpointIndex = $derived(goal.checkpoints.findIndex(c => c.id === checkpoint.id));
@@ -20,34 +35,48 @@
 
     function playTimer() {
         if (!checkpoint.timer.isRunning) {
+            if (checkpoint.timer.timerId) {
+                clearInterval(checkpoint.timer.timerId);
+            }
+
             const timerId = setInterval(() => {
                 const newTime = checkpoint.timer.totalTime + 1;
                 updateCheckpoint(goal.id, checkpoint.id, {
                     timer: {
+                        ...checkpoint.timer,
                         totalTime: newTime,
                         lastStartTime: Date.now(),
                         isRunning: true,
-                        timerId,
-                        tags: checkpoint.timer.tags
+                        timerId
                     }
                 });
                 displayTime = newTime;
             }, 1000);
+
+            updateCheckpoint(goal.id, checkpoint.id, {
+                timer: {
+                    ...checkpoint.timer,
+                    isRunning: true,
+                    timerId,
+                    lastStartTime: Date.now()
+                }
+            });
         } else {
             clearInterval(checkpoint.timer.timerId);
             updateCheckpoint(goal.id, checkpoint.id, {
                 timer: {
                     ...checkpoint.timer,
                     isRunning: false,
-                    timerId: null,
-                    tags: checkpoint.timer.tags
+                    timerId: null
                 }
             });
         }
     }
     
     function endTimer() {
-        clearInterval(checkpoint.timer.timerId);
+        if (checkpoint.timer.timerId) {
+            clearInterval(checkpoint.timer.timerId);
+        }
 
         const currentTags = checkpoint.timer.tags;
         const timeSinceLastAction = currentTags.length > 0 

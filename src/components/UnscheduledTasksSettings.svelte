@@ -4,7 +4,7 @@
     import {tasks, selectedDate, unscheduledTasks} from "../stores";
     import { formatToISODate } from "../stores";
 
-    let { editMode = false, taskToEdit = null } = $props();
+    let { editMode = false, taskToEdit = null, updateShowUnscheduledSettings } = $props();
 
     let taskName = $state(editMode ? taskToEdit.name : "");
     let taskColor = $state(editMode ? taskToEdit.color : "#4287f5");
@@ -51,7 +51,10 @@
 </script>
 
 <div class="task-settings bg-gray-900">
-    <button class=" absolute top-1 right-1" aria-label="close" onclick="{() => document.querySelector(".task-settings").remove()}"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg></button>
+    <button class=" absolute top-1 right-1" aria-label="close" onclick="{() => {
+        document.querySelector(".task-settings").remove();
+        updateShowUnscheduledSettings();
+        }}"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg></button>
     <input class="name-input bg-gray-900" placeholder="Name"  bind:value={taskName}>
     <div class="time-container bg-gray-900">
         <CalendarPopup bind:selectedDate={taskDate}/>   

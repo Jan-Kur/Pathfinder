@@ -78,6 +78,7 @@
                                                 deadline: "",
                                                 emoji: "",
                                                 isSet: false,
+                                                checkpoints: []
                                             }
                                         }
                                         return g

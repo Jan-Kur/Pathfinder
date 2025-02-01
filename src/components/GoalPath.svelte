@@ -4,30 +4,37 @@
     
     let {goalId, updateSelectedGoal} = $props();
     let goal = $derived($goals.find(g => g.id === goalId));
-    let totalPoints = $state(0);
+    let totalPoints = $derived(goal.totalPoints || 0);
     let maxPoints = $derived(goal.hours * 600);
     let progress = $derived(Math.min((totalPoints / maxPoints) * 100, 100));
     let showCheckpointSettings = $state(false);
     let newCheckpointId = $state(null);
 
+    let pathHeight = $derived(`${Math.max(500, goal.checkpoints.length * 300)}px`);
     
     function addCheckpoint() {
         const checkpointId = crypto.randomUUID();
         goals.update(currentGoals => 
             currentGoals.map(g =>
                 g.id === goalId
-                    ? { ...g, checkpoints: [...g.checkpoints, { 
-                        id: checkpointId,
-                        name: "",
-                        isCompleted: false,
-                        timer: {
-                            timerId: null,
-                            totalTime: 0,
-                            isRunning: false,
-                            lastStartTime: 0,
-                            tags: []
-                        },
-                    }] }
+                    ? { 
+                        ...g, 
+                        checkpoints: [
+                            { 
+                                id: checkpointId,
+                                name: "",
+                                isCompleted: false,
+                                timer: {
+                                    timerId: null,
+                                    totalTime: 0,
+                                    isRunning: false,
+                                    lastStartTime: 0,
+                                    tags: []
+                                },
+                            },
+                            ...g.checkpoints
+                        ]
+                    }
                     : g
             )
         );
@@ -95,7 +102,7 @@
             <div class="flag-glow absolute inset-[-50%] bg-cyan-500/20 rounded-full blur-lg"></div>
         </div>
         
-        <div class="progress-line absolute left-1/2 -translate-x-1/2 w-2 h-[90%] bg-slate-700/50 rounded">
+        <div class="progress-line absolute left-1/2 -translate-x-1/2 w-2 bg-slate-700/50 rounded" style="height: {pathHeight};">
             <div class="line-fill absolute bottom-0 w-full bg-cyan-500 rounded" style="height: {progress}%;"></div>
             <div class="character absolute left-1/2 -translate-x-1/2 translate-y-1/2 z-20" style="bottom: calc({progress}% - 0.5rem)">
                 <span class="character-emoji text-4xl">{goal.emoji}</span>
@@ -103,7 +110,7 @@
             </div>
         </div>
 
-        <div class="checkpoints-container relative z-10 flex flex-col gap-6 lg:gap-8 w-full max-w-[90%] lg:max-w-md mx-auto">
+        <div class="checkpoints-container relative z-10 flex flex-col gap-6 lg:gap-8 w-full max-w-[90%] lg:max-w-md mx-auto" style="height: {pathHeight};">
             {#each goal.checkpoints as checkpoint}
                 <Checkpoint {checkpoint} {goal}/>
             {/each}
@@ -161,4 +168,14 @@
         background: rgba(71, 85, 105, 0.5);
         border-radius: 3px;
     }
+
+    .checkpoints-container {
+        min-height: 500px;
+        position: relative;
+    }
+
+    .progress-line {
+        min-height: 500px;
+    }
+
 </style>

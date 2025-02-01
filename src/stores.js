@@ -27,6 +27,17 @@ export function updateCheckpoint(goalId, checkpointId, updates) {
 }
 
 
+export function updateGoalPoints(goalId, pointsToAdd) {
+    goals.update(currentGoals =>
+        currentGoals.map(goal =>
+            goal.id === goalId
+                ? { ...goal, totalPoints: (goal.totalPoints || 0) + pointsToAdd }
+                : goal
+        )
+    );
+}
+
+
 export function formatTime(seconds) {
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
@@ -107,3 +118,17 @@ export const tasks = writable([
     reminder: true
 }
 ]);
+
+export const unscheduledTasks = writable([
+    {
+    name: "kodowanie",
+    color: "purple",
+    emoji: "💻",
+    date: getTodayDate()
+},
+{
+    name: "zakupy",
+    color: "#orange",
+    emoji: "🛍️",
+    date: getTodayDate()
+}])

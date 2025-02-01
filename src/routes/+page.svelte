@@ -9,6 +9,7 @@
     import Goals from "../components/Goals.svelte";
     import GoalSettings from "../components/GoalSettings.svelte";
     import Checkpoint from "../components/Checkpoint.svelte";
+	import UnscheduledTasks from "../components/UnscheduledTasks.svelte";
 
     function formatDate(dateString) {
         const date = new Date(dateString);

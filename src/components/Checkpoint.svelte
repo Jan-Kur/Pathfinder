@@ -1,5 +1,5 @@
 <script>
-    import { formatTime, updateCheckpoint, formatTagTime } from "../stores";
+    import { formatTime, updateCheckpoint, formatTagTime, updateGoalPoints} from "../stores";
     import { fade, slide } from 'svelte/transition';
 
     let {checkpoint, goal} = $props();
@@ -12,7 +12,7 @@
 
     let checkpointIndex = $derived(goal.checkpoints.findIndex(c => c.id === checkpoint.id));
     let totalCheckpoints = $derived(goal.checkpoints.length);
-    let verticalPosition = $derived(`${(checkpointIndex + 1) * (100 / (totalCheckpoints + 1))}%`);
+    let verticalPosition = $derived(`${((totalCheckpoints - checkpointIndex) * (100 / (totalCheckpoints + 1)))}%`);
     
     function openCheckpoint() {
         showCheckpoint = !showCheckpoint;
@@ -48,6 +48,14 @@
     
     function endTimer() {
         clearInterval(checkpoint.timer.timerId);
+
+        const currentTags = checkpoint.timer.tags;
+        const timeSinceLastAction = currentTags.length > 0 
+            ? checkpoint.timer.totalTime - currentTags[currentTags.length - 1].timerValue 
+            : checkpoint.timer.totalTime;
+
+        calculateAndAddPoints(timeSinceLastAction);
+
         updateCheckpoint(goal.id, checkpoint.id, {
             isCompleted: true,
             timer: {
@@ -68,6 +76,8 @@
             ? checkpoint.timer.totalTime - currentTags[currentTags.length - 1].timerValue 
             : checkpoint.timer.totalTime;
 
+        calculateAndAddPoints(timeSinceLastTag);
+
         const newTag = {
             timestamp: now,
             timerValue: checkpoint.timer.totalTime,
@@ -81,10 +91,17 @@
             }
         });
     }
+
+    function calculateAndAddPoints(timeSinceLastAction) {
+        const minutes = Math.floor(timeSinceLastAction / 60);
+        const points = minutes * 10;
+        updateGoalPoints(goal.id, points);
+    }
+
 </script>
 
 
-<div class="checkpoint-container" style="top: {verticalPosition};">
+<div class="checkpoint-container" style="bottom: {verticalPosition};">
     <div class="flex flex-col items-center">
         <div class="checkpoint-name">{checkpoint.name}</div>
         <button aria-label="Checkpoint-flag-button" class="flag-button" onclick={openCheckpoint}>
@@ -149,6 +166,7 @@
         position: absolute;
         left: 50%;
         transform: translateX(-50%);
+        bottom: 0;
         display: flex;
         flex-direction: row;
         align-items: center;

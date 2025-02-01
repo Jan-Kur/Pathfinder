@@ -1,15 +1,45 @@
-import { writable } from "svelte/store";
+import { writable, get } from "svelte/store";
 
 function getTodayDate() {
     const today = new Date();
     return today.toISOString().split("T")[0];
 }
 
+export const checkpointStore = writable({});
+
+export function updateCheckpoint(goalId, checkpointId, updates) {
+    goals.update(currentGoals => 
+        currentGoals.map(goal => {
+            if (goal.id === goalId) {
+                const updatedCheckpoint = goal.checkpoints.find(cp => cp.id === checkpointId);
+                return {
+                    ...goal,
+                    checkpoints: goal.checkpoints.map(cp => 
+                        cp.id === checkpointId 
+                            ? { ...cp, ...updates, timer: { ...cp.timer, ...updates.timer } }
+                            : cp
+                    )
+                };
+            }
+            return goal;
+        })
+    );
+}
+
+
 export function formatTime(seconds) {
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
     const s = Math.floor(seconds % 60);
     return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+}
+
+export function formatTagTime(date) {
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${day}/${month} ${hours}:${minutes}`;
 }
 
 export const selectedDate = writable(getTodayDate());

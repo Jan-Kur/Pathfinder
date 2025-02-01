@@ -36,7 +36,6 @@
         </div>
         
         <div class="">
-            <Checkpoint/>
         </div>
     </div>
 </div>

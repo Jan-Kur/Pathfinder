@@ -12,7 +12,6 @@
 
     
     function addCheckpoint() {
-        console.log(goal)
         const checkpointId = crypto.randomUUID();
         goals.update(currentGoals => 
             currentGoals.map(g =>
@@ -22,6 +21,7 @@
                         name: "",
                         isCompleted: false,
                         timer: {
+                            timerId: null,
                             totalTime: 0,
                             isRunning: false,
                             lastStartTime: 0,
@@ -32,7 +32,6 @@
             )
         );
         newCheckpointId = checkpointId;
-        console.log(goal)
         showCheckpointSettings = true;
     }
 
@@ -106,7 +105,7 @@
 
         <div class="checkpoints-container relative z-10 flex flex-col gap-6 lg:gap-8 w-full max-w-[90%] lg:max-w-md mx-auto">
             {#each goal.checkpoints as checkpoint}
-                <Checkpoint {checkpoint}/>
+                <Checkpoint {checkpoint} {goal}/>
             {/each}
         </div>
     </div>

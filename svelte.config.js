@@ -11,9 +11,9 @@ const config = {
             strict: true
         }),
         paths: {
-            base: 'Pathfinder'
+            base: '/Pathfinder'
         }
     }
 };
 
-export default config;
+export default config

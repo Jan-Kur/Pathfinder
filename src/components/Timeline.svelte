@@ -11,12 +11,6 @@
         showTaskSettings = false;
     }
 
-    $effect(() => {
-        tasksArray = [...$tasks]
-            .filter(task => task.date === $selectedDate)
-            .sort((a, b) => a.start - b.start);
-    })
-
     function createGradientString(tasks) {
         if (!tasks.length) return 'white';
         const stops = tasks.map((task, index) => {

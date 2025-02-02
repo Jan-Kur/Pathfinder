@@ -1,5 +1,31 @@
 import { writable, get } from "svelte/store";
 
+function getStorageValue(key, defaultValue) {
+    if (typeof window === "undefined") return defaultValue;
+
+    const stored = localStorage.getItem(key);
+    if (stored === null) return defaultValue;
+
+    try {
+        return JSON.parse(stored);
+    } catch {
+        return defaultValue;
+    }
+}
+
+function createPersistedStore(key, initialValue) {
+    const stored = getStorageValue(key, initialValue);
+
+    const store = writable(stored);
+
+    store.subscribe(value => {
+        if (typeof window !== "undefined") {
+            localStorage.setItem(key, JSON.stringify(value));
+        }
+    });
+    return store;
+}
+
 function getTodayDate() {
     const today = new Date();
     return today.toISOString().split("T")[0];
@@ -53,8 +79,9 @@ export function formatTagTime(date) {
     return `${day}/${month} ${hours}:${minutes}`;
 }
 
-export const selectedDate = writable(getTodayDate());
-export const goals = writable([
+export const selectedDate = createPersistedStore("selectedDate", getTodayDate());
+
+export const goals = createPersistedStore("goals", [
         { id: 1, isSet: false, name: "", emoji: "", hours: 0, deadline: "", checkpoints: []},
         { id: 2, isSet: false, name: "", emoji: "", hours: 0, deadline: "", checkpoints: []},
         { id: 3, isSet: false, name: "", emoji: "", hours: 0, deadline: "", checkpoints: []}
@@ -80,55 +107,37 @@ export function formatToISODate(date) {
     return date;
 }
 
-export const tasks = writable([
+export const tasks = createPersistedStore("tasks", [
     {
-    name: "prysznic",
-    start: 1200,
-    end: 1210,
+    name: "breakfast",
+    start: 495,
+    end: 510,
     date: getTodayDate(),
     color: "#f72daa",
-    emoji: "🚿",
-    reminder: true
-},
-{
-    name: "bieganie",
-    start: 1220,
-    end: 1255,
-    date: getTodayDate(),
-    color: "aquamarine",
-    emoji: "🏃",
-    reminder: true
-},
-{
-    name: "obiad",
-    start: 600,
-    end: 650,
-    date: getTodayDate(),
-    color: "navy",
     emoji: "🍽️",
     reminder: true
 },
 {
-    name: "kodowanie",
-    start: 700,
-    end: 759,
+    name: "running",
+    start: 420,
+    end: 480,
     date: getTodayDate(),
-    color: "#fc0356",
-    emoji: "💻",
+    color: "aquamarine",
+    emoji: "🏃",
     reminder: true
 }
 ]);
 
-export const unscheduledTasks = writable([
+export const unscheduledTasks = createPersistedStore("unscheduledTasks", [
     {
-    name: "kodowanie",
-    color: "purple",
-    emoji: "💻",
+    name: "taking out the trash",
+    color: "#113b13",
+    emoji: "🗑️",
     date: getTodayDate()
 },
 {
-    name: "zakupy",
-    color: "orange",
-    emoji: "🛍️",
+    name: "homework",
+    color: "#1b88bf",
+    emoji: "📚",
     date: getTodayDate()
 }])
